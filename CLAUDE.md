@@ -75,3 +75,33 @@ See `docs/prd.md` for full API endpoint mapping.
 3. **API Methods**: Add to `DatadogClient` class in `src/lib/client.ts`
 4. **Error Handling**: Use custom error classes, display with Ink components
 5. **Output**: Support both human-readable (default) and JSON (`--json`) formats
+
+## Git Conventions
+
+**Always use [Conventional Commits](https://www.conventionalcommits.org/):**
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Formatting, no code change
+- `refactor`: Code change that neither fixes a bug nor adds a feature
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks (deps, build, etc.)
+
+**Scopes** (optional): `metrics`, `events`, `monitors`, `dashboards`, `logs`, `config`, `client`, `cli`
+
+**Examples:**
+```
+feat(metrics): add submit command
+fix(client): handle 429 rate limit responses
+docs: update README with installation instructions
+chore: upgrade ink to v4
+refactor(config): simplify yaml parsing logic
+```
