@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Tech Stack
 
 - **Language**: TypeScript
-- **Runtime**: Node.js >= 18
+- **Runtime**: Bun
 - **CLI Framework**: Pastel (built on Ink)
 - **UI Rendering**: Ink (React for CLI)
 - **HTTP Client**: Native fetch
@@ -32,13 +32,15 @@ docs/
 
 ```bash
 # Development
-npm run dev         # Run in development mode
-npm run build       # Build for production
-npm run lint        # Run ESLint
-npm run typecheck   # Run TypeScript type checking
+bun run dev         # Watch mode + run CLI
+bun run dev:tui     # Watch mode + run TUI
+bun run build       # Build for production
+bun run start       # Build + run CLI
+bun run lint        # Run ESLint
+bun run typecheck   # Run TypeScript type checking
 
 # Testing
-npm test            # Run tests
+bun test            # Run tests
 ```
 
 ## Architecture Notes
@@ -61,9 +63,9 @@ npm test            # Run tests
 ## API Scope
 
 The CLI covers four main areas:
-1. **Core Monitoring**: Metrics, Events, Hosts, Service Checks
+1. **Core Monitoring**: Metrics, Hosts, Service Checks
 2. **Dashboards**: Dashboards, Dashboard Lists, Notebooks
-3. **Monitors & Alerting**: Monitors, Downtimes, SLOs
+3. **Monitors & Alerting**: Monitors
 4. **Logs**: Log submission/search, Indexes, Pipelines, Archives
 
 See `docs/prd.md` for full API endpoint mapping.
