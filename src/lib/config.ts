@@ -2,12 +2,11 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import { homedir } from 'os';
 import { dirname, join } from 'path';
-import { parse, stringify } from 'yaml';
+import { parse } from 'dotenv';
 import {
   Config,
   ConfigSchema,
   PartialConfig,
-  PartialConfigSchema,
   DatadogSite,
   DATADOG_SITES,
 } from '../types/config.js';
@@ -22,7 +21,7 @@ export class ConfigError extends Error {
 }
 
 /**
- * Load config from ~/.dogrc file
+ * Load config from ~/.dogrc file (dotenv format)
  */
 async function loadConfigFile(): Promise<PartialConfig> {
   if (!existsSync(CONFIG_PATH)) {
@@ -32,13 +31,21 @@ async function loadConfigFile(): Promise<PartialConfig> {
   try {
     const content = await readFile(CONFIG_PATH, 'utf-8');
     const parsed = parse(content);
-    return PartialConfigSchema.parse(parsed ?? {});
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('ENOENT')) {
-      return {};
+
+    const config: PartialConfig = {};
+
+    if (parsed.DD_API_KEY) {
+      config.api_key = parsed.DD_API_KEY;
     }
-    // If the file is in an old/incompatible format, return empty config
-    // and let env vars take over
+    if (parsed.DD_APP_KEY) {
+      config.app_key = parsed.DD_APP_KEY;
+    }
+    if (parsed.DD_SITE && DATADOG_SITES.includes(parsed.DD_SITE as DatadogSite)) {
+      config.site = parsed.DD_SITE as DatadogSite;
+    }
+
+    return config;
+  } catch {
     return {};
   }
 }
@@ -79,19 +86,13 @@ export async function loadConfig(): Promise<Config> {
   const fileConfig = await loadConfigFile();
   const envConfig = getEnvConfig();
 
-  // Merge configs: env vars override file config
-  const merged = {
-    ...fileConfig,
-    ...envConfig,
-  };
-
-  // Validate the merged config
+  const merged = { ...fileConfig, ...envConfig };
   const result = ConfigSchema.safeParse(merged);
 
   if (!result.success) {
     const missing: string[] = [];
-    if (!merged.api_key) missing.push('api_key (or DD_API_KEY)');
-    if (!merged.app_key) missing.push('app_key (or DD_APP_KEY)');
+    if (!merged.api_key) missing.push('DD_API_KEY');
+    if (!merged.app_key) missing.push('DD_APP_KEY');
 
     if (missing.length > 0) {
       throw new ConfigError(
@@ -107,22 +108,24 @@ export async function loadConfig(): Promise<Config> {
 }
 
 /**
- * Save config to ~/.dogrc file
+ * Save config to ~/.dogrc file (dotenv format)
  */
 export async function saveConfig(config: PartialConfig): Promise<void> {
-  // Load existing config and merge
   const existing = await loadConfigFile();
   const merged = { ...existing, ...config };
 
-  // Ensure directory exists
   const dir = dirname(CONFIG_PATH);
   if (!existsSync(dir)) {
     await mkdir(dir, { recursive: true });
   }
 
-  // Write as YAML
-  const content = stringify(merged);
-  await writeFile(CONFIG_PATH, content, { mode: 0o600 }); // Read/write for owner only
+  // Convert to dotenv format
+  const lines: string[] = [];
+  if (merged.api_key) lines.push(`DD_API_KEY=${merged.api_key}`);
+  if (merged.app_key) lines.push(`DD_APP_KEY=${merged.app_key}`);
+  if (merged.site) lines.push(`DD_SITE=${merged.site}`);
+
+  await writeFile(CONFIG_PATH, lines.join('\n') + '\n', { mode: 0o600 });
 }
 
 /**

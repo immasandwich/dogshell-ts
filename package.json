@@ -38,10 +38,10 @@
     "node": ">=18"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "ink": "^6.6.0",
     "pastel": "^4.0.0",
     "react": "^19.2.3",
-    "yaml": "^2.8.2",
     "zod": "^4.3.5"
   },
   "devDependencies": {

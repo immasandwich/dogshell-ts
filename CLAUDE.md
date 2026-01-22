@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **CLI Framework**: Pastel (built on Ink)
 - **UI Rendering**: Ink (React for CLI)
 - **HTTP Client**: Native fetch
-- **Config**: YAML (~/.dogrc)
+- **Config**: dotenv (~/.dogrc)
 
 ## Project Structure
 
@@ -46,16 +46,18 @@ bun test            # Run tests
 ## Architecture Notes
 
 ### Configuration
-- Config file: `~/.dogrc` (YAML format)
+
+- Config file: `~/.dogrc` (dotenv format)
 - Environment variables override config: `DD_API_KEY`, `DD_APP_KEY`, `DD_SITE`
-- Config fields: `api_key`, `app_key`, `site`
 
 ### API Client
+
 - Base URL constructed from `site` config (e.g., `api.datadoghq.com`, `api.datadoghq.eu`)
 - All requests include `DD-API-KEY` and `DD-APPLICATION-KEY` headers
 - Rate limit handling with exponential backoff on 429 responses
 
 ### Command Structure
+
 - Commands follow pattern: `dog <resource> <action> [args] [flags]`
 - Examples: `dog metrics submit`, `dog monitor list`, `dog dashboard export`
 - Global flags: `--json` (JSON output), `--quiet` (minimal output)
@@ -63,6 +65,7 @@ bun test            # Run tests
 ## API Scope
 
 The CLI covers four main areas:
+
 1. **Core Monitoring**: Metrics, Hosts, Service Checks
 2. **Dashboards**: Dashboards, Dashboard Lists, Notebooks
 3. **Monitors & Alerting**: Monitors
@@ -77,6 +80,7 @@ See `docs/prd.md` for full API endpoint mapping.
 3. **API Methods**: Add to `DatadogClient` class in `src/lib/client.ts`
 4. **Error Handling**: Use custom error classes, display with Ink components
 5. **Output**: Support both human-readable (default) and JSON (`--json`) formats
+6. **Dependencies**: Prefer well-maintained public libraries over custom implementations (e.g., `dotenv`, `zod`). Don't reinvent the wheel.
 
 ## Git Conventions
 
@@ -89,6 +93,7 @@ See `docs/prd.md` for full API endpoint mapping.
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation only
@@ -100,6 +105,7 @@ See `docs/prd.md` for full API endpoint mapping.
 **Scopes** (optional): `metrics`, `events`, `monitors`, `dashboards`, `logs`, `config`, `client`, `cli`
 
 **Examples:**
+
 ```
 feat(metrics): add submit command
 fix(client): handle 429 rate limit responses
