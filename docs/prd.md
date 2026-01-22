@@ -34,22 +34,13 @@
 | `metrics tags list` | `GET /api/v2/metrics/{metric_name}/tags` | List tags for a metric |
 | `metrics tags update` | `PATCH /api/v2/metrics/{metric_name}/tags` | Update tags configuration |
 
-#### 1.2 Events
-
-| Command | API Endpoint | Description |
-|---------|--------------|-------------|
-| `events post` | `POST /api/v1/events` | Post an event |
-| `events get` | `GET /api/v1/events/{event_id}` | Get event details |
-| `events list` | `GET /api/v1/events` | Query events stream |
-| `events search` | `POST /api/v2/events/search` | Search events (v2) |
-
-#### 1.3 Service Checks
+#### 1.2 Service Checks
 
 | Command | API Endpoint | Description |
 |---------|--------------|-------------|
 | `check submit` | `POST /api/v1/check_run` | Submit a service check |
 
-#### 1.4 Hosts
+#### 1.3 Hosts
 
 | Command | API Endpoint | Description |
 |---------|--------------|-------------|
@@ -58,7 +49,7 @@
 | `hosts mute` | `POST /api/v1/host/{host_name}/mute` | Mute a host |
 | `hosts unmute` | `POST /api/v1/host/{host_name}/unmute` | Unmute a host |
 
-#### 1.5 Tags
+#### 1.4 Tags
 
 | Command | API Endpoint | Description |
 |---------|--------------|-------------|
@@ -127,37 +118,6 @@
 | `monitor mute-all` | `POST /api/v1/monitor/mute_all` | Mute all monitors |
 | `monitor unmute-all` | `POST /api/v1/monitor/unmute_all` | Unmute all monitors |
 
-#### 3.2 Downtimes
-
-| Command | API Endpoint | Description |
-|---------|--------------|-------------|
-| `downtime list` | `GET /api/v2/downtime` | List all downtimes |
-| `downtime get` | `GET /api/v2/downtime/{downtime_id}` | Get downtime details |
-| `downtime create` | `POST /api/v2/downtime` | Schedule a downtime |
-| `downtime update` | `PATCH /api/v2/downtime/{downtime_id}` | Update a downtime |
-| `downtime cancel` | `DELETE /api/v2/downtime/{downtime_id}` | Cancel a downtime |
-
-#### 3.3 Service Level Objectives (SLOs)
-
-| Command | API Endpoint | Description |
-|---------|--------------|-------------|
-| `slo list` | `GET /api/v1/slo` | List all SLOs |
-| `slo get` | `GET /api/v1/slo/{slo_id}` | Get SLO details |
-| `slo create` | `POST /api/v1/slo` | Create an SLO |
-| `slo update` | `PUT /api/v1/slo/{slo_id}` | Update an SLO |
-| `slo delete` | `DELETE /api/v1/slo/{slo_id}` | Delete an SLO |
-| `slo history` | `GET /api/v1/slo/{slo_id}/history` | Get SLO history |
-
-#### 3.4 SLO Corrections
-
-| Command | API Endpoint | Description |
-|---------|--------------|-------------|
-| `slo-correction list` | `GET /api/v1/slo/correction` | List SLO corrections |
-| `slo-correction get` | `GET /api/v1/slo/correction/{correction_id}` | Get correction details |
-| `slo-correction create` | `POST /api/v1/slo/correction` | Create an SLO correction |
-| `slo-correction update` | `PATCH /api/v1/slo/correction/{correction_id}` | Update a correction |
-| `slo-correction delete` | `DELETE /api/v1/slo/correction/{correction_id}` | Delete a correction |
-
 ---
 
 ### 4. Logs
@@ -203,16 +163,6 @@
 | `logs archive delete` | `DELETE /api/v2/logs/config/archives/{archive_id}` | Delete an archive |
 | `logs archive order` | `GET /api/v2/logs/config/archive-order` | Get archive order |
 | `logs archive reorder` | `PUT /api/v2/logs/config/archive-order` | Update archive order |
-
-#### 4.5 Log-based Metrics
-
-| Command | API Endpoint | Description |
-|---------|--------------|-------------|
-| `logs metric list` | `GET /api/v2/logs/config/metrics` | List log-based metrics |
-| `logs metric get` | `GET /api/v2/logs/config/metrics/{metric_id}` | Get metric details |
-| `logs metric create` | `POST /api/v2/logs/config/metrics` | Create log-based metric |
-| `logs metric update` | `PATCH /api/v2/logs/config/metrics/{metric_id}` | Update a metric |
-| `logs metric delete` | `DELETE /api/v2/logs/config/metrics/{metric_id}` | Delete a metric |
 
 ---
 
@@ -279,8 +229,8 @@ dog dashboard export abc-123-def > dashboard.json
 # Search logs
 dog logs list --query "service:api status:error" --from "-15m" --limit 100
 
-# Schedule a downtime
-dog downtime create --scope "env:staging" --message "Deployment" --duration 30m
+# List hosts
+dog hosts list --filter "env:production"
 ```
 
 ---
@@ -316,7 +266,6 @@ This stack is chosen to enable a future TUI mode while providing a solid CLI exp
 | Category | Commands |
 |----------|----------|
 | **Metrics** | 7 commands |
-| **Events** | 4 commands |
 | **Service Checks** | 1 command |
 | **Hosts** | 4 commands |
 | **Tags** | 5 commands |
@@ -324,15 +273,11 @@ This stack is chosen to enable a future TUI mode while providing a solid CLI exp
 | **Dashboard Lists** | 8 commands |
 | **Notebooks** | 5 commands |
 | **Monitors** | 11 commands |
-| **Downtimes** | 5 commands |
-| **SLOs** | 6 commands |
-| **SLO Corrections** | 5 commands |
 | **Logs** | 3 commands |
 | **Log Indexes** | 5 commands |
 | **Log Pipelines** | 7 commands |
 | **Log Archives** | 7 commands |
-| **Log Metrics** | 5 commands |
-| **Total** | **95 commands** |
+| **Total** | **70 commands** |
 
 ---
 
@@ -341,13 +286,11 @@ This stack is chosen to enable a future TUI mode while providing a solid CLI exp
 ### v0.1.0 - MVP
 - Authentication & configuration (~/.dogrc)
 - Metrics: submit, query
-- Events: post, list
 - Monitors: list, get, create, mute/unmute
 - Dashboards: list, get, export
 
 ### v0.2.0 - Core Complete
 - Full Metrics API
-- Full Events API
 - Full Hosts/Tags API
 - Service Checks
 
@@ -358,8 +301,6 @@ This stack is chosen to enable a future TUI mode while providing a solid CLI exp
 
 ### v0.4.0 - Alerting Complete
 - Full Monitors API
-- Downtimes
-- SLOs & Corrections
 
 ### v1.0.0 - Full Release
 - Full Logs API

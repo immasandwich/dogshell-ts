@@ -10,26 +10,20 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Initialize npm project with `package.json`
 - [ ] Configure TypeScript (`tsconfig.json`)
 - [ ] Set up ESLint and Prettier
-- [ ] Add `.gitignore`
-- [ ] Create basic directory structure:
-  ```
-  src/
-    commands/
-    components/
-    lib/
-    types/
-  ```
+- [ ] Create basic directory structure: `src/{commands,components,lib,types}`
 
 ### 0.2 Install Dependencies
 - [ ] Install Ink and React (`ink`, `react`)
-- [ ] Install Pastel (`@anthropic-ai/pastel` or build from source)
+- [ ] Install Pastel (`pastel`)
 - [ ] Install YAML parser (`yaml`)
 - [ ] Install dev dependencies (TypeScript, types, build tools)
 
 ### 0.3 Build Configuration
-- [ ] Set up build script (tsc or tsup)
+- [ ] Set up build script (tsup)
 - [ ] Configure executable entry point in `package.json` (`bin` field)
 - [ ] Test that `dog --help` runs
+
+**Success Criteria:** `npm run build` succeeds, `./dist/cli.js --help` displays Pastel help output
 
 ---
 
@@ -49,6 +43,8 @@ This document breaks down the project into small, incremental tasks. Each task s
   - Error handling
 - [ ] Add request/response type definitions
 - [ ] Implement rate limit handling (429 retry with backoff)
+
+**Success Criteria:** Can instantiate `DatadogClient` with config from `~/.dogrc` or env vars, and make authenticated requests to Datadog API
 
 ---
 
@@ -75,29 +71,26 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Create `dog metrics tags list <metric>` command
 - [ ] Create `dog metrics tags update <metric>` command
 
+**Success Criteria:** `dog metrics submit --metric test.metric --value 42` submits to Datadog successfully; `dog metrics metadata get <metric>` returns metadata
+
 ---
 
-## Phase 3: Core Monitoring - Events & Hosts
+## Phase 3: Core Monitoring - Hosts
 
-### 3.1 Events Post
-- [ ] Define `Event` type
-- [ ] Implement `POST /api/v1/events` in client
-- [ ] Create `dog events post` command
-- [ ] Parse flags: `--title`, `--text`, `--tags`, `--priority`, `--alert-type`
-- [ ] Support `--file` for reading event text from file
-
-### 3.2 Hosts List
+### 3.1 Hosts List
 - [ ] Define `Host` type
 - [ ] Implement `GET /api/v1/hosts` in client
 - [ ] Create `dog hosts list` command
 - [ ] Parse flags: `--filter`, `--sort`, `--from`
 - [ ] Display host table with key info
 
-### 3.3 Service Checks
+### 3.2 Service Checks
 - [ ] Define `ServiceCheck` type
 - [ ] Implement `POST /api/v1/check_run` in client
 - [ ] Create `dog check submit` command
 - [ ] Parse flags: `--check`, `--host`, `--status`, `--message`, `--tags`
+
+**Success Criteria:** `dog hosts list` shows hosts; `dog check submit` posts service check
 
 ---
 
@@ -136,6 +129,8 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Create `dog monitor mute-all` command
 - [ ] Create `dog monitor unmute-all` command
 - [ ] Parse flags: `--scope`, `--end`
+
+**Success Criteria:** Full monitor CRUD works; `dog monitor list` shows monitors; `dog monitor create --file monitor.json` creates monitor; mute/unmute changes monitor state
 
 ---
 
@@ -184,55 +179,19 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Create `dog notebook update <notebook_id>` command
 - [ ] Create `dog notebook delete <notebook_id>` command
 
----
-
-## Phase 6: Downtimes & SLOs
-
-### 6.1 Downtime Types & Client
-- [ ] Define `Downtime` types
-- [ ] Implement all downtime endpoints in client (v2 API)
-
-### 6.2 Downtime Commands
-- [ ] Create `dog downtime list` command
-- [ ] Create `dog downtime get <downtime_id>` command
-- [ ] Create `dog downtime create` command
-- [ ] Parse flags: `--scope`, `--message`, `--start`, `--end`, `--duration`, `--monitor-id`
-- [ ] Create `dog downtime update <downtime_id>` command
-- [ ] Create `dog downtime cancel <downtime_id>` command
-
-### 6.3 SLO Types & Client
-- [ ] Define `SLO`, `SLOHistory` types
-- [ ] Implement all SLO endpoints in client
-
-### 6.4 SLO Commands
-- [ ] Create `dog slo list` command
-- [ ] Create `dog slo get <slo_id>` command
-- [ ] Create `dog slo create` command
-- [ ] Create `dog slo update <slo_id>` command
-- [ ] Create `dog slo delete <slo_id>` command
-- [ ] Create `dog slo history <slo_id>` command
-- [ ] Parse flags: `--from`, `--to`
-
-### 6.5 SLO Correction Commands
-- [ ] Define `SLOCorrection` types
-- [ ] Implement SLO correction endpoints in client
-- [ ] Create `dog slo-correction list` command
-- [ ] Create `dog slo-correction get <correction_id>` command
-- [ ] Create `dog slo-correction create` command
-- [ ] Create `dog slo-correction update <correction_id>` command
-- [ ] Create `dog slo-correction delete <correction_id>` command
+**Success Criteria:** `dog dashboard export <id> > dash.json && dog dashboard import --file dash.json` round-trips a dashboard; dashboard lists and notebooks CRUD works
 
 ---
 
-## Phase 7: Logs
+## Phase 6: Logs
 
-### 7.1 Logs Client & Types
+### 6.1 Logs Client & Types
 - [ ] Define `LogEntry`, `LogSearchResult`, `LogAggregation` types
 - [ ] Implement log submission endpoint (v2)
 - [ ] Implement log search endpoint (v2)
 - [ ] Implement log aggregate endpoint (v2)
 
-### 7.2 Core Log Commands
+### 6.2 Core Log Commands
 - [ ] Create `dog logs submit` command
 - [ ] Support stdin for log entries
 - [ ] Parse flags: `--message`, `--service`, `--source`, `--tags`, `--hostname`
@@ -240,7 +199,7 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Parse flags: `--query`, `--from`, `--to`, `--limit`
 - [ ] Create `dog logs aggregate` command
 
-### 7.3 Log Indexes
+### 6.3 Log Indexes
 - [ ] Implement log index endpoints in client
 - [ ] Create `dog logs index list` command
 - [ ] Create `dog logs index get <name>` command
@@ -248,7 +207,7 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Create `dog logs index order` command
 - [ ] Create `dog logs index reorder` command
 
-### 7.4 Log Pipelines
+### 6.4 Log Pipelines
 - [ ] Implement log pipeline endpoints in client
 - [ ] Create `dog logs pipeline list` command
 - [ ] Create `dog logs pipeline get <pipeline_id>` command
@@ -258,7 +217,7 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Create `dog logs pipeline order` command
 - [ ] Create `dog logs pipeline reorder` command
 
-### 7.5 Log Archives
+### 6.5 Log Archives
 - [ ] Implement log archive endpoints in client (v2)
 - [ ] Create `dog logs archive list` command
 - [ ] Create `dog logs archive get <archive_id>` command
@@ -268,25 +227,19 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Create `dog logs archive order` command
 - [ ] Create `dog logs archive reorder` command
 
-### 7.6 Log-based Metrics
-- [ ] Implement log metrics endpoints in client (v2)
-- [ ] Create `dog logs metric list` command
-- [ ] Create `dog logs metric get <metric_id>` command
-- [ ] Create `dog logs metric create` command
-- [ ] Create `dog logs metric update <metric_id>` command
-- [ ] Create `dog logs metric delete <metric_id>` command
+**Success Criteria:** `dog logs submit --message "test"` sends log; `dog logs list --query "service:test"` returns logs; indexes/pipelines/archives CRUD works
 
 ---
 
-## Phase 8: Polish & Release
+## Phase 7: Polish & Release
 
-### 8.1 Documentation
+### 7.1 Documentation
 - [ ] Write README.md with installation and quick start
 - [ ] Add usage examples for common workflows
 - [ ] Document all commands with `--help`
 - [ ] Add CHANGELOG.md
 
-### 8.2 Testing
+### 7.2 Testing
 - [ ] Set up test framework (Vitest or Jest)
 - [ ] Add unit tests for config loading
 - [ ] Add unit tests for API client
@@ -309,6 +262,8 @@ This document breaks down the project into small, incremental tasks. Each task s
 - [ ] Review error messages for clarity
 - [ ] Test on Linux, macOS, Windows
 - [ ] Publish v1.0.0 to npm
+
+**Success Criteria:** `npm install -g dogshell-ts && dog --help` works; CI passes; README has clear install/usage instructions; published to npm
 
 ---
 
@@ -334,12 +289,11 @@ This document breaks down the project into small, incremental tasks. Each task s
 Phase 0 (Setup)
     └── Phase 1 (Foundation)
             ├── Phase 2 (Metrics)
-            ├── Phase 3 (Events & Hosts)
+            ├── Phase 3 (Hosts)
             ├── Phase 4 (Monitors)
             ├── Phase 5 (Dashboards)
-            ├── Phase 6 (Downtimes/SLOs)
-            └── Phase 7 (Logs)
-                    └── Phase 8 (Polish)
+            └── Phase 6 (Logs)
+                    └── Phase 7 (Polish)
 ```
 
-Phases 2-7 can be worked on in parallel once Phase 1 is complete.
+Phases 2-6 can be worked on in parallel once Phase 1 is complete.
